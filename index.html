@@ -3,11 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- PWA OBLIGATORIOS -->
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#5c3d2e" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <title>Mi tiempo con Dios</title>
 <style>
 html{margin:0;padding:0;}
@@ -19,11 +16,13 @@ button{padding:8px 10px;border-radius:5px;border:none;font-size:15px;cursor:poin
 .b-negr{background:#f2c94c;color:#222;}
 .b-curs{background:#ffe066;color:#222;}
 .b-sub{background:#ffb74d;color:#222;}
-.b-tach{background:#ffa726;color:#222;}
 .b-ama{background:#fff266;color:#333;}
 .b-ver{background:#b7ff94;color:#222;}
 .b-azu{background:#94d9ff;color:#222;}
 .b-ros{background:#ffcffb;color:#222;}
+.b-masletra{background:#e67e22;color:white;}
+.b-menosletra{background:#8e44ad;color:white;}
+.b-nuevapag{background:#27ae60;color:white; font-weight:bold;}
 .b-leer{background:#4cd137;color:white;}
 .b-pausa{background:#ffa502;color:white;}
 .b-parar{background:#e84118;color:white;}
@@ -32,7 +31,7 @@ span{color:#fff;font-weight:500;}
 .hoja{background:#fffdf0;background-image:linear-gradient(#e0dac8 1px,transparent 1px);background-size:100% 28px;border-radius:8px;min-height:70vh;padding:20px;box-shadow:0 0 15px rgba(0,0,0,0.5);}
 .texto{min-height:65vh;font-size:16px;line-height:28px;color:#2b2b2b;outline:none;}
 .texto * {font-size:inherit !important;}
-.pie{display:flex;justify-content:center;align-items:center;gap:20px;margin-top:15px;}
+.pie{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:15px;flex-wrap:wrap;}
 .btn-pag{background:#ffd166;font-weight:bold;}
 .num{color:white;font-size:17px;font-weight:bold;}
 </style>
@@ -46,17 +45,20 @@ span{color:#fff;font-weight:500;}
     <button class="b-negr" onclick="document.execCommand('bold')">Negrita</button>
     <button class="b-curs" onclick="document.execCommand('italic')">Cursiva</button>
     <button class="b-sub" onclick="document.execCommand('underline')">Subrayar</button>
-    <button class="b-tach" onclick="document.execCommand('strikeThrough')">Tachar</button>
+    <button class="b-masletra" onclick="cambiarTamano(+2)">A+</button>
+    <button class="b-menosletra" onclick="cambiarTamano(-2)">A-</button>
   </div>
   <div class="fila">
-    <button class="b-ama" onclick="document.execCommand('hiliteColor',false,'#fff266')">Amarillo</button>
-    <button class="b-ver" onclick="document.execCommand('hiliteColor',false,'#b7ff94')">Verde</button>
-    <button class="b-azu" onclick="document.execCommand('hiliteColor',false,'#94d9ff')">Azul</button>
-    <button class="b-ros" onclick="document.execCommand('hiliteColor',false,'#ffcffb')">Rosa</button>
+    <!-- Función propia para repetir mismo color sin fallar -->
+    <button class="b-ama" onclick="resaltarColor('#fff266')">Amarillo</button>
+    <button class="b-ver" onclick="resaltarColor('#b7ff94')">Verde</button>
+    <button class="b-azu" onclick="resaltarColor('#94d9ff')">Azul</button>
+    <button class="b-ros" onclick="resaltarColor('#ffcffb')">Rosa</button>
     <span>Letra:</span><input type="color" id="colorLetra" onchange="document.execCommand('foreColor',false,this.value)">
     <span>Hoja:</span><input type="color" id="colorFondo">
   </div>
   <div class="fila">
+    <button class="b-nuevapag" onclick="agregarPagina()">➕ Nueva Página</button>
     <button class="b-leer" id="btnLeer">🔊 Leer</button>
     <button class="b-pausa" id="btnPausa" disabled>⏸️</button>
     <button class="b-parar" id="btnParar" disabled>⏹️</button>
@@ -74,12 +76,10 @@ span{color:#fff;font-weight:500;}
 </div>
 
 <script>
-// Registrar Service Worker PARA FUNCIONAR SIN INTERNET
+// Registrar service worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js')
-    .then(reg => console.log('Service Worker listo', reg))
-    .catch(err => console.log('Fallo SW', err));
+    navigator.serviceWorker.register('service-worker.js');
   });
 }
 
@@ -116,6 +116,35 @@ function mostrarPagina(){
   document.getElementById('textoPag').textContent = `Pág ${paginaActual+1} de ${paginas.length}`;
   document.getElementById('btnAnt').disabled = paginaActual === 0;
   document.getElementById('btnSig').disabled = paginaActual >= paginas.length - 1;
+}
+
+// 🆕 AGREGAR PÁGINA NUEVA CUANDO QUIERAS, SIN LÍMITE
+function agregarPagina(){
+  paginas.push({texto:"", color:"#fffdf0"});
+  guardarCambios();
+  mostrarPagina();
+  alert("✅ Página nueva agregada, ya puedes usarla!");
+}
+
+// 🎨 SOLUCIÓN RESALTAR: aplica seguro incluso si es el MISMO color
+function resaltarColor(color){
+  document.execCommand('hiliteColor', false, 'transparent'); // limpia brevemente
+  setTimeout(()=>{ document.execCommand('hiliteColor', false, color); }, 10);
+}
+
+// 🔤 TAMAÑO LETRA AUMENTAR / DISMINUIR
+function cambiarTamano(cantidad){
+  const sel = window.getSelection();
+  if(!sel.rangeCount) return alert("Selecciona primero el texto para cambiar tamaño");
+  // Aplica estilo directo robusto
+  const rango = sel.getRangeAt(0);
+  const span = document.createElement('span');
+  let tamActual = parseInt(window.getComputedStyle(rango.commonAncestorContainer).fontSize) || 16;[[__LINK_ICON]](https://www.tutorialspoint.com/article/javascript-how-to-allow-users-to-change-the-font-size-of-a-webpage?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiJkMDJmZWQwZTQ1ZjBiYjI5LTFiOTA3OTg5YTVkMWZjOGUifQ%3D%3D "[__LINK_ICON]")
+  tamActual = Math.max(12, tamActual + cantidad); // mínimo 12 para leer bien[[__LINK_ICON]](https://www.tutorialspoint.com/article/javascript-how-to-allow-users-to-change-the-font-size-of-a-webpage?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiJkMDJmZWQwZTQ1ZjBiYjI5LTFiOTA3OTg5YTVkMWZjOGUifQ%3D%3D "[__LINK_ICON]")
+  span.style.fontSize = tamActual + 'px';
+  rango.surroundContents(span);
+  sel.removeAllRanges();
+  sel.addRange(rango);
 }
 
 document.getElementById('btnAnt').onclick=()=>{

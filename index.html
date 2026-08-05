@@ -7,33 +7,52 @@
 <meta name="theme-color" content="#5c3d2e" />
 <title>Mi tiempo con Dios</title>
 <style>
-html{margin:0;padding:0;}
+html{margin:0;padding:0;box-sizing:border-box;}
 body{background:#5c3d2e;padding:10px;font-family:Georgia,serif;}
 h1{text-align:center;color:#ffecb3;margin:5px 0;}
-.barra{background:#3a251a;padding:10px;border-radius:8px;margin-bottom:10px;}
-.fila{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:5px 0;}
-button{padding:8px 10px;border-radius:5px;border:none;font-size:15px;cursor:pointer;}
+
+/* Barra ordenada clara */
+.barra{background:#3a251a;padding:10px;border-radius:8px;margin-bottom:12px;}
+.fila{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:6px 0;}
+button{padding:8px 10px;border-radius:5px;border:none;font-size:15px;cursor:pointer;font-weight:500;}
 .b-negr{background:#f2c94c;color:#222;}
 .b-curs{background:#ffe066;color:#222;}
 .b-sub{background:#ffb74d;color:#222;}
-.b-ama{background:#fff266;color:#333;}
+.b-mas{background:#e67e22;color:white;}
+.b-menos{background:#8e44ad;color:white;}
+.b-ama{background:#fff266;color:#222;}
 .b-ver{background:#b7ff94;color:#222;}
-.b-azu{background:#94d9ff;color:#222;}
+.b-azu{background:#78d0ff;color:#222;}
 .b-ros{background:#ffcffb;color:#222;}
-.b-masletra{background:#e67e22;color:white;}
-.b-menosletra{background:#8e44ad;color:white;}
-.b-nuevapag{background:#27ae60;color:white; font-weight:bold;}
-.b-leer{background:#4cd137;color:white;}
-.b-pausa{background:#ffa502;color:white;}
-.b-parar{background:#e84118;color:white;}
-input{width:40px;height:35px;border-radius:5px;border:none;}
+.b-nueva{background:#27ae60;color:white;}
+.b-leer{background:#2ecc71;color:white;}
+.b-pausa{background:#f39c12;color:white;}
+.b-parar{background:#e74c3c;color:white;}
+input{width:42px;height:36px;border-radius:5px;border:none;cursor:pointer;}
 span{color:#fff;font-weight:500;}
-.hoja{background:#fffdf0;background-image:linear-gradient(#e0dac8 1px,transparent 1px);background-size:100% 28px;border-radius:8px;min-height:70vh;padding:20px;box-shadow:0 0 15px rgba(0,0,0,0.5);}
-.texto{min-height:65vh;font-size:16px;line-height:28px;color:#2b2b2b;outline:none;}
-.texto * {font-size:inherit !important;}
-.pie{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:15px;flex-wrap:wrap;}
-.btn-pag{background:#ffd166;font-weight:bold;}
-.num{color:white;font-size:17px;font-weight:bold;}
+
+/* 📄 HOJA CUADERNO ARREGLADA: líneas claras, fondo crema, texto oscuro SIEMPRE */
+.hoja{
+  background-color:#fffdf0;
+  background-image:linear-gradient(transparent 95%, #d9d2c0 1px);[[__LINK_ICON]](https://github.com/hlsearl/task-tracker/blob/main/NOTEBOOK-STYLING.md?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiI4YmQ5MTQxYWMzNDE5MDQxLTQ5YTJiMjRkMmQ1Y2VjYTMifQ%3D%3D "[__LINK_ICON]")
+  background-size:100% 28px; /* espaciado línea */
+  border-radius:8px;
+  min-height:70vh;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.35);
+}
+.texto{
+  min-height:65vh;
+  font-size:16px;
+  line-height:28px; /* coincide con línea */
+  color:#2b2b2b !important; /* texto oscuro fijo, no invertir */
+  outline:none;
+}
+
+/* Pie navegación limpio */
+.pie{display:flex;justify-content:center;align-items:center;gap:15px;margin-top:15px;flex-wrap:wrap;}
+.btn-pag{background:#ffd166;color:#2c2000;font-weight:bold;}
+.num{color:#fff;font-size:17px;font-weight:bold;}
 </style>
 </head>
 <body>
@@ -45,130 +64,92 @@ span{color:#fff;font-weight:500;}
     <button class="b-negr" onclick="document.execCommand('bold')">Negrita</button>
     <button class="b-curs" onclick="document.execCommand('italic')">Cursiva</button>
     <button class="b-sub" onclick="document.execCommand('underline')">Subrayar</button>
-    <button class="b-masletra" onclick="cambiarTamano(+2)">A+</button>
-    <button class="b-menosletra" onclick="cambiarTamano(-2)">A-</button>
+    <button class="b-mas" onclick="aumentarTam()">A+</button>
+    <button class="b-menos" onclick="disminuirTam()">A-</button>
   </div>
   <div class="fila">
-    <!-- Función propia para repetir mismo color sin fallar -->
-    <button class="b-ama" onclick="resaltarColor('#fff266')">Amarillo</button>
-    <button class="b-ver" onclick="resaltarColor('#b7ff94')">Verde</button>
-    <button class="b-azu" onclick="resaltarColor('#94d9ff')">Azul</button>
-    <button class="b-ros" onclick="resaltarColor('#ffcffb')">Rosa</button>
-    <span>Letra:</span><input type="color" id="colorLetra" onchange="document.execCommand('foreColor',false,this.value)">
-    <span>Hoja:</span><input type="color" id="colorFondo">
+    <button class="b-ama" onclick="resaltar('#fff266')">Amarillo</button>
+    <button class="b-ver" onclick="resaltar('#b7ff94')">Verde</button>
+    <button class="b-azu" onclick="resaltar('#78d0ff')">Azul</button>
+    <button class="b-ros" onclick="resaltar('#ffcffb')">Rosa</button>
+    <span>✍️Letra:</span><input type="color" id="inpColorLetra" onchange="document.execCommand('foreColor',false,this.value)">
+    <span>📄Hoja:</span><input type="color" id="inpColorHoja">
   </div>
   <div class="fila">
-    <button class="b-nuevapag" onclick="agregarPagina()">➕ Nueva Página</button>
+    <button class="b-nueva" onclick="agregarPag()">➕ Nueva Página</button>
     <button class="b-leer" id="btnLeer">🔊 Leer</button>
     <button class="b-pausa" id="btnPausa" disabled>⏸️</button>
     <button class="b-parar" id="btnParar" disabled>⏹️</button>
   </div>
 </div>
 
-<div class="hoja" id="miHoja">
-  <div class="texto" contenteditable="true" id="zonaTexto">Escribe aquí tu corazón, oración o prédica 🙏</div>
+<div class="hoja" id="cajaHoja">
+  <div class="texto" contenteditable="true" id="zonaTexto">Escribe aquí oraciones, reflexiones, prédicas largas... 🙏</div>
 </div>
 
 <div class="pie">
   <button class="btn-pag" id="btnAnt">⬅️ Anterior</button>
-  <span class="num" id="textoPag">Pág 1 de 5</span>
+  <span class="num" id="etqPag">Página 1 de 5</span>
   <button class="btn-pag" id="btnSig">Siguiente ➡️</button>
 </div>
 
 <script>
 // Registrar service worker
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js');
-  });
+  window.addEventListener('load', () => navigator.serviceWorker.register('service-worker.js'));
 }
 
-let paginas = [];
-let paginaActual = 0;
-const voz = speechSynthesis;
+let paginas = [], pagAct=0, voz=speechSynthesis, leyendo=false;
 
 window.onload = ()=>{
   let guardado = localStorage.getItem('miTiempoConDiosApp');
-  if(guardado){
-    paginas = JSON.parse(guardado);
-  }else{
-    paginas = [
-      {texto:"Escribe aquí tu corazón, oración o prédica 🙏", color:"#fffdf0"},
-      {texto:"", color:"#fffdf0"},
-      {texto:"", color:"#fffdf0"},
-      {texto:"", color:"#fffdf0"},
-      {texto:"", color:"#fffdf0"}
-    ];
-  }
+  if(guardado) paginas = JSON.parse(guardado);
+  else paginas = Array(5).fill(null).map(()=>({texto:"Escribe aquí tu corazón 🙏",color:"#fffdf0"}));
   mostrarPagina();
-  document.getElementById('zonaTexto').addEventListener('input', guardarCambios);
+  document.getElementById('zonaTexto').addEventListener('input', guardar);
 };
 
-function guardarCambios(){
-  paginas[paginaActual].texto = document.getElementById('zonaTexto').innerHTML;
+function guardar(){
+  paginas[pagAct].texto = document.getElementById('zonaTexto').innerHTML;
   localStorage.setItem('miTiempoConDiosApp', JSON.stringify(paginas));
 }
 
 function mostrarPagina(){
-  document.getElementById('zonaTexto').innerHTML = paginas[paginaActual].texto;
-  document.getElementById('miHoja').style.background = paginas[paginaActual].color;
-  document.getElementById('colorFondo').value = paginas[paginaActual].color;
-  document.getElementById('textoPag').textContent = `Pág ${paginaActual+1} de ${paginas.length}`;
-  document.getElementById('btnAnt').disabled = paginaActual === 0;
-  document.getElementById('btnSig').disabled = paginaActual >= paginas.length - 1;
+  document.getElementById('zonaTexto').innerHTML = paginas[pagAct].texto;
+  document.getElementById('cajaHoja').style.backgroundColor = paginas[pagAct].color;
+  document.getElementById('inpColorHoja').value = paginas[pagAct].color;
+  document.getElementById('etqPag').textContent = `Página ${pagAct+1} de ${paginas.length}`;
+  document.getElementById('btnAnt').disabled = pagAct===0;
+  document.getElementById('btnSig').disabled = pagAct >= paginas.length-1;
 }
 
-// 🆕 AGREGAR PÁGINA NUEVA CUANDO QUIERAS, SIN LÍMITE
-function agregarPagina(){
-  paginas.push({texto:"", color:"#fffdf0"});
-  guardarCambios();
-  mostrarPagina();
-  alert("✅ Página nueva agregada, ya puedes usarla!");
+// Nueva página sin límite
+function agregarPag(){
+  paginas.push({texto:"",color:"#fffdf0"}); guardar(); mostrarPagina(); alert("✅ Página nueva agregada");
 }
 
-// 🎨 SOLUCIÓN RESALTAR: aplica seguro incluso si es el MISMO color
-function resaltarColor(color){
-  document.execCommand('hiliteColor', false, 'transparent'); // limpia brevemente
-  setTimeout(()=>{ document.execCommand('hiliteColor', false, color); }, 10);
+// 🎨 Resaltar seguro: funciona repetir MISMO color
+function resaltar(color){
+  document.execCommand('styleWithCss',false,true); // modo estable
+  document.execCommand('hiliteColor',false,color);
 }
 
-// 🔤 TAMAÑO LETRA AUMENTAR / DISMINUIR
-function cambiarTamano(cantidad){
-  const sel = window.getSelection();
-  if(!sel.rangeCount) return alert("Selecciona primero el texto para cambiar tamaño");
-  // Aplica estilo directo robusto
-  const rango = sel.getRangeAt(0);
-  const span = document.createElement('span');
-  let tamActual = parseInt(window.getComputedStyle(rango.commonAncestorContainer).fontSize) || 16;[[__LINK_ICON]](https://www.tutorialspoint.com/article/javascript-how-to-allow-users-to-change-the-font-size-of-a-webpage?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiJkMDJmZWQwZTQ1ZjBiYjI5LTFiOTA3OTg5YTVkMWZjOGUifQ%3D%3D "[__LINK_ICON]")
-  tamActual = Math.max(12, tamActual + cantidad); // mínimo 12 para leer bien[[__LINK_ICON]](https://www.tutorialspoint.com/article/javascript-how-to-allow-users-to-change-the-font-size-of-a-webpage?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiJkMDJmZWQwZTQ1ZjBiYjI5LTFiOTA3OTg5YTVkMWZjOGUifQ%3D%3D "[__LINK_ICON]")
-  span.style.fontSize = tamActual + 'px';
-  rango.surroundContents(span);
-  sel.removeAllRanges();
-  sel.addRange(rango);
+// 🔤 TAMAÑO LETRA FUNCIONANDO: usa comando nativo fiable
+function aumentarTam(){ document.execCommand('fontSize',false,'+1'); }[[__LINK_ICON]](https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiJhMTgwNWEyZTE5NWNkZTc4LTk1MjVhOWFlODJlZmZlNjEifQ%3D%3D "[__LINK_ICON]")
+function disminuirTam(){ document.execCommand('fontSize',false,'-1'); }[[__LINK_ICON]](https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiJhMTgwNWEyZTE5NWNkZTc4LTk1MjVhOWFlODJlZmZlNjEifQ%3D%3D "[__LINK_ICON]")
+
+// 🎤 LEER: lee SELECCIÓN primero, si no selecciona lee toda la página
+function textoParaLeer(){
+  let sel = window.getSelection().toString().trim();
+  if(sel) return sel;
+  let temp = document.createElement('div'); temp.innerHTML = document.getElementById('zonaTexto').innerHTML;
+  return temp.textContent.trim() || "No hay texto aún";[[__LINK_ICON]](https://github.com/leonar15/SelectNSpeak?f_link_type=f_linkinlinenote&flow_extra=eyJpbmxpbmVfZGlzcGxheV9wb3NpdGlvbiI6MCwiZG9jX3Bvc2l0aW9uIjowLCJkb2NfaWQiOiI2MzBiMjY1ZTQ3NzYwOTU2LWRjZWQyNWQzNTdhNDdhNWUifQ%3D%3D "[__LINK_ICON]")
 }
-
-document.getElementById('btnAnt').onclick=()=>{
-  if(paginaActual>0){ --paginaActual; mostrarPagina(); detenerLectura(); }
-};
-document.getElementById('btnSig').onclick=()=>{
-  if(paginaActual < paginas.length-1){ ++paginaActual; mostrarPagina(); detenerLectura(); }
-};
-
-document.getElementById('colorFondo').onchange=(e)=>{
-  paginas[paginaActual].color = e.target.value;
-  guardarCambios(); mostrarPagina();
-};
-
-function textoLimpio(){
-  let temp=document.createElement('div'); temp.innerHTML=document.getElementById('zonaTexto').innerHTML;
-  return temp.textContent.trim() || "Esta página está vacía";
-}
-let leyendo=false;
 document.getElementById('btnLeer').onclick=()=>{
   if(leyendo) return voz.resume();
-  let fr=new SpeechSynthesisUtterance(textoLimpio()); fr.lang='es-ES';
-  voz.speak(fr); leyendo=true; estadoVoz(true);
-  fr.onend=()=>{leyendo=false; estadoVoz(false);};
+  let u = new SpeechSynthesisUtterance(textoParaLeer()); u.lang='es-ES';
+  voz.speak(u); leyendo=true; estadoVoz(true);
+  u.onend=()=>{leyendo=false; estadoVoz(false);};
 };
 document.getElementById('btnPausa').onclick=()=>voz.pause();
 document.getElementById('btnParar').onclick=()=>{voz.cancel(); leyendo=false; estadoVoz(false);};
@@ -177,7 +158,11 @@ function estadoVoz(act){
   document.getElementById('btnPausa').disabled=!act;
   document.getElementById('btnParar').disabled=!act;
 }
-function detenerLectura(){voz.cancel(); leyendo=false; estadoVoz(false);}
+
+// Navegación páginas
+document.getElementById('btnAnt').onclick=()=>{if(pagAct>0){--pagAct;mostrarPagina();voz.cancel();leyendo=false;estadoVoz(false);}};
+document.getElementById('btnSig').onclick=()=>{if(pagAct < paginas.length-1){++pagAct;mostrarPagina();voz.cancel();leyendo=false;estadoVoz(false);}};
+document.getElementById('inpColorHoja').onchange=(e)=>{paginas[pagAct].color=e.target.value;guardar();mostrarPagina();};
 </script>
 </body>
 </html>

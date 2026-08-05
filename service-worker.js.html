@@ -1,0 +1,19 @@
+const NOMBRE_CACHE = 'cuaderno-v1';
+const ARCHIVOS = [
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png'
+];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(NOMBRE_CACHE).then(cache => cache.addAll(ARCHIVOS))
+  );
+});
+
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    caches.match(e.request).then(res => res || fetch(e.request))
+  );
+});

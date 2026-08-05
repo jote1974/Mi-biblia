@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi tiempo con Dios</title>
+<style>
+html{margin:0;padding:0;}
+body{background:#5c3d2e;padding:10px;font-family:Georgia,serif;}
+h1{text-align:center;color:#ffecb3;margin:5px 0;}
+
+/* Barra ordenada */
+.barra{background:#3a251a;padding:10px;border-radius:8px;margin-bottom:10px;}
+.fila{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:5px 0;}
+button{padding:8px 10px;border-radius:5px;border:none;font-size:15px;cursor:pointer;}
+.b-negr{background:#f2c94c;color:#222;}
+.b-curs{background:#ffe066;color:#222;}
+.b-sub{background:#ffb74d;color:#222;}
+.b-tach{background:#ffa726;color:#222;}
+.b-ama{background:#fff266;color:#333;}
+.b-ver{background:#b7ff94;color:#222;}
+.b-azu{background:#94d9ff;color:#222;}
+.b-ros{background:#ffcffb;color:#222;}
+.b-leer{background:#4cd137;color:white;}
+.b-pausa{background:#ffa502;color:white;}
+.b-parar{background:#e84118;color:white;}
+input{width:40px;height:35px;border-radius:5px;border:none;}
+span{color:#fff;font-weight:500;}
+
+/* Libreta: LETRA FIJA TAMAÑO 14+, no achica al pegar */
+.hoja{background:#fffdf0;background-image:linear-gradient(#e0dac8 1px,transparent 1px);background-size:100% 28px;border-radius:8px;min-height:70vh;padding:20px;box-shadow:0 0 15px rgba(0,0,0,0.5);}
+.texto{min-height:65vh;font-size:16px;line-height:28px;color:#2b2b2b;outline:none;}
+/* Forzar tamaño mínimo al pegar contenido */
+.texto * {font-size:inherit !important;}
+
+/* Navegación perfectamente alineada */
+.pie{display:flex;justify-content:center;align-items:center;gap:20px;margin-top:15px;}
+.btn-pag{background:#ffd166;font-weight:bold;}
+.num{color:white;font-size:17px;font-weight:bold;}
+</style>
+</head>
+<body>
+
+<h1>📖 Mi tiempo con Dios</h1>
+
+<div class="barra">
+  <div class="fila">
+    <button class="b-negr" onclick="document.execCommand('bold')">Negrita</button>
+    <button class="b-curs" onclick="document.execCommand('italic')">Cursiva</button>
+    <button class="b-sub" onclick="document.execCommand('underline')">Subrayar</button>
+    <button class="b-tach" onclick="document.execCommand('strikeThrough')">Tachar</button>
+  </div>
+  <div class="fila">
+    <button class="b-ama" onclick="document.execCommand('hiliteColor',false,'#fff266')">Amarillo</button>
+    <button class="b-ver" onclick="document.execCommand('hiliteColor',false,'#b7ff94')">Verde</button>
+    <button class="b-azu" onclick="document.execCommand('hiliteColor',false,'#94d9ff')">Azul</button>
+    <button class="b-ros" onclick="document.execCommand('hiliteColor',false,'#ffcffb')">Rosa</button>
+    <span>Letra:</span><input type="color" id="colorLetra" onchange="document.execCommand('foreColor',false,this.value)">
+    <span>Hoja:</span><input type="color" id="colorFondo">
+  </div>
+  <div class="fila">
+    <button class="b-leer" id="btnLeer">🔊 Leer</button>
+    <button class="b-pausa" id="btnPausa" disabled>⏸️</button>
+    <button class="b-parar" id="btnParar" disabled>⏹️</button>
+  </div>
+</div>
+
+<div class="hoja" id="miHoja">
+  <div class="texto" contenteditable="true" id="zonaTexto">Escribe aquí tu corazón, oración o prédica 🙏</div>
+</div>
+
+<div class="pie">
+  <button class="btn-pag" id="btnAnt">⬅️ Anterior</button>
+  <span class="num" id="textoPag">Pág 1 de 5</span>
+  <button class="btn-pag" id="btnSig">Siguiente ➡️</button>
+</div>
+
+<script>
+// CADA PÁGINA TIENE SU TEXTO Y COLOR PROPIO → NO SE REPITE
+let paginas = [];
+let paginaActual = 0;
+const voz = speechSynthesis;
+
+window.onload = ()=>{
+  let guardado = localStorage.getItem('miTiempoConDiosApp');
+  if(guardado){
+    paginas = JSON.parse(guardado);
+  }else{
+    // 5 páginas independientes vacías al inicio
+    paginas = [
+      {texto:"Escribe aquí tu corazón, oración o prédica 🙏", color:"#fffdf0"},
+      {texto:"", color:"#fffdf0"},
+      {texto:"", color:"#fffdf0"},
+      {texto:"", color:"#fffdf0"},
+      {texto:"", color:"#fffdf0"}
+    ];
+  }
+  mostrarPagina();
+  document.getElementById('zonaTexto').addEventListener('input', guardarCambios);
+};
+
+function guardarCambios(){
+  paginas[paginaActual].texto = document.getElementById('zonaTexto').innerHTML;
+  localStorage.setItem('miTiempoConDiosApp', JSON.stringify(paginas));
+}
+
+function mostrarPagina(){
+  document.getElementById('zonaTexto').innerHTML = paginas[paginaActual].texto;
+  document.getElementById('miHoja').style.background = paginas[paginaActual].color;
+  document.getElementById('colorFondo').value = paginas[paginaActual].color;
+  document.getElementById('textoPag').textContent = `Pág ${paginaActual+1} de ${paginas.length}`;
+  document.getElementById('btnAnt').disabled = paginaActual === 0;
+  document.getElementById('btnSig').disabled = paginaActual >= paginas.length - 1;
+}
+
+document.getElementById('btnAnt').onclick=()=>{
+  if(paginaActual>0){ --paginaActual; mostrarPagina(); detenerLectura(); }
+};
+document.getElementById('btnSig').onclick=()=>{
+  if(paginaActual < paginas.length-1){ ++paginaActual; mostrarPagina(); detenerLectura(); }
+};
+
+document.getElementById('colorFondo').onchange=(e)=>{
+  paginas[paginaActual].color = e.target.value;
+  guardarCambios(); mostrarPagina();
+};
+
+// Lectura voz alta funcional
+function textoLimpio(){
+  let temp=document.createElement('div'); temp.innerHTML=document.getElementById('zonaTexto').innerHTML;
+  return temp.textContent.trim() || "Esta página está vacía";
+}
+let leyendo=false;
+document.getElementById('btnLeer').onclick=()=>{
+  if(leyendo) return voz.resume();
+  let fr=new SpeechSynthesisUtterance(textoLimpio()); fr.lang='es-ES';
+  voz.speak(fr); leyendo=true; estadoVoz(true);
+  fr.onend=()=>{leyendo=false; estadoVoz(false);};
+};
+document.getElementById('btnPausa').onclick=()=>voz.pause();
+document.getElementById('btnParar').onclick=()=>{voz.cancel(); leyendo=false; estadoVoz(false);};
+function estadoVoz(act){
+  document.getElementById('btnLeer').disabled=act;
+  document.getElementById('btnPausa').disabled=!act;
+  document.getElementById('btnParar').disabled=!act;
+}
+function detenerLectura(){voz.cancel(); leyendo=false; estadoVoz(false);}
+</script>
+</body>
+</html>
